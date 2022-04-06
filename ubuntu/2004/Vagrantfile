@@ -1,0 +1,45 @@
+# frozen_string_literal: true
+
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure('2') do |config|
+  config.vm.box = 'generic/ubuntu2004'
+
+  config.vm.provider :virtualbox do |vb|
+    vb.memory = 8192
+    vb.cpus = 4
+  end
+
+  config.vm.synced_folder '.', '/vagrant'
+
+  config.vm.provision 'shell', privileged: false, inline: <<-SHELL
+    sudo apt-get update
+    sudo apt-get -y install ca-certificates
+    sudo apt-get -y install git curl libssl-dev libreadline-dev zlib1g-dev autoconf bison build-essential libyaml-dev libreadline-dev libncurses5-dev libffi-dev libgdbm-dev
+
+    sudo rm -rf /usr/local/bin/rbenv-install
+
+    curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-installer | bash
+
+    echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+    echo 'export GEM_HOME="$HOME/.gem"' >> ~/.bashrc
+    echo 'eval "$(rbenv init - bash)"' >> ~/.bashrc
+    source ~/.bashrc
+
+    export PATH="$HOME/.rbenv/bin:$PATH"
+    curl -fsSL "https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-doctor" | bash
+
+    rbenv install 2.7.2
+    rbenv global 2.7.2
+    ruby -v
+
+    echo "gem: --no-document" > ~/.gemrc
+
+    GEM_HOME="$HOME/.gem" gem install bundler
+
+    bundle config set --local path './.bundle/gems'
+
+    echo "Box bootstrapped! You can now run 'vagrant ssh'"
+  SHELL
+end
