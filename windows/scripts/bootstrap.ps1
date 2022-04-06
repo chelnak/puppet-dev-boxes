@@ -1,57 +1,79 @@
-# The following code was heavily inspired by the following source:
-# https://github.com/puppetlabs/Puppet.Dsc/blob/main/extras/install.ps1
+$ProgressPreference = "SilentlyContinue"
+$ToolsDirectory = "C:\tools"
+$null = mkdir $ToolsDirectory
+$null = mkdir $ENV:UserProfile\code
 
-$Packages = @(
-    'vscode',
-    'googlechrome',
-    'git',
-    'curl',
-    'poshgit'
-)
+function Install-Application {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [string]$Installer,
+        [Parameter(Mandatory = $true, Position = 1)]
+        [string]$ExePath,
+        [Parameter(Mandatory = $true, Position = 2)]
+        [string]$Arguments
+    )
 
-$Modules = @(
-    @{ Name = 'RubyInstaller' }
-)
+    Invoke-WebRequest -Uri $Installer -OutFile $ExePath
 
-Write-Host 'Installing Chocolatey'
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-
-choco install $Packages --yes --no-progress --stop-on-first-failure --ignore-checksums
-if ($LastExitCode -ne 0) {
-    throw 'Installation with choco failed.'
-}
-
-Write-Host 'Reloading Path to pick up installed software'
-Import-Module C:\ProgramData\chocolatey\helpers\chocolateyProfile.psm1
-Update-SessionEnvironment
-
-ForEach ($Module in $Modules) {
-    $InstalledModuleVersions = Get-Module -ListAvailable $Module.Name -ErrorAction SilentlyContinue |
-    Select-Object -ExpandProperty Version
-    If ($Module.ContainsKey('RequiredVersion')) {
-        $AlreadyInstalled = $null -ne ($InstalledModuleVersions | Where-Object -FilterScript { $_ -eq $Module.RequiredVersion })
-    }
-    Else {
-        $AlreadyInstalled = $null -ne $InstalledModuleVersions
-    }
-    If ($AlreadyInstalled) {
-        Write-Verbose "Skipping $($Module.Name) as it is already installed at $($InstalledModuleVersions)"
-    }
-    Else {
-        Write-Verbose "Installing $($Module.Name)"
-        Install-Module @Module -Force -SkipPublisherCheck -AllowClobber
+    $Proc = Start-Process -FilePath $ExePath -ArgumentList $Arguments -PassThru -Wait
+    if ($Proc.ExitCode -ne 0) {
+        Write-Error "Installation failed for $($Installer.split("/")[-1])}!" -ErrorAction Stop
     }
 }
 
-Import-Module 'RubyInstaller'
-Install-Ruby -RubyVersions @('2.7.2-1 (x64)') -Verbose
 
-# Enable RDP
+function Install-Chrome {
+    $Installer = "http://dl.google.com/chrome/install/375.126/chrome_installer.exe"
+    $ExePath = "$ToolsDirectory\chrome.exe"
+    $InstallArgs = "/silent /install"
+
+    Install-Application -Installer $Installer -ExePath $ExePath -Arguments $InstallArgs
+}
+
+function Install-VSCode {
+    Write-Host "-> Installing VSCode"
+    $Installer = "https://az764295.vo.msecnd.net/stable/e18005f0f1b33c29e81d732535d8c0e47cafb0b5/VSCodeSetup-x64-1.66.0.exe"
+    $ExePath = "$ToolsDirectory\vscode.exe"
+    $InstallArgs = "/VERYSILENT /NORESTART /MERGETASKS=!runcode,addcontextmenufiles,addcontextmenufolders,desktopicon"
+
+    Install-Application -Installer $Installer -ExePath $ExePath -Arguments $InstallArgs
+}
+
+
+function Install-Git {
+    Write-Host "-> Installing Git"
+    $Installer = "https://github.com/git-for-windows/git/releases/download/v2.35.1.windows.2/Git-2.35.1.2-64-bit.exe"
+    $ExePath = "$ToolsDirectory\git.exe"
+    $InstallArgs = "/VERYSILENT /NORESTART"
+
+    Install-Application -Installer $Installer -ExePath $ExePath -Arguments $InstallArgs
+}
+
+
+function Install-PoshGit {
+    Write-Host "-> Installing PoshGit"
+    Install-Module PowershellGet -Force
+    Install-Module posh-git -Scope CurrentUser -Force
+}
+
+
+function Install-Ruby {
+    Write-Host "-> Installing Ruby"
+    $Installer = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.7.5-1/rubyinstaller-devkit-2.7.5-1-x64.exe"
+    $ExePath = "${ToolsDirectory}\ruby.exe"
+    $InstallArgs = "/silent /tasks='assocfiles,modpath'"
+
+    Install-Application -Installer $Installer -ExePath $ExePath -Arguments $InstallArgs
+}
+
+Install-Git
+Install-Ruby
+Install-VSCode
+Install-PoshGit
+Install-Chrome
+
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
 Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-
-# Make code directory
-mkdir -p $env:userprofile\code
 
 Write-Host "Box bootstrapped! You can now run 'vagrant rdp'"

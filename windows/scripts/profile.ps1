@@ -15,7 +15,5 @@ Function New-LocalGemfile {
     [IO.File]::WriteAllLines($Path, $Gems)
 }
 
-Import-Module C:\ProgramData\chocolatey\helpers\chocolateyProfile.psm1
-Update-SessionEnvironment
-Import-Module C:\tools\poshgit\*posh-git*\src\posh-git.psd1
+Import-Module posh-git
 Set-Location -Path $env:userprofile\code

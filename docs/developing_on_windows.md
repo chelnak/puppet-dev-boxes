@@ -34,21 +34,6 @@ Open vscode and start a new terminal.
 code .
 ```
 
-Next, we need to activate the correct version of Ruby. The bootstrap process installs ruby with the `RubyInstaller` PowerShell module. We can use this to configure our session.
-
-From the terminal run the following:
-
-```PowerShell
-> Get-Ruby
-
-Tag            Description
----            -----------
-=> 2.7.2-1-x64 ruby 2.7.2p137 (2020-10-01 revision 5445e04352) [x64-mingw32]
-
-
-> Select-Ruby -RubyTag 2.7.2-1-x64
-```
-
 Debugging requires a few extra gems. For this we generally create a local Gemfile so that we don't have add any unnecessary dependencies in to our main Gemfile.
 
 For this you can use the following helper function that will be available in your current session.
