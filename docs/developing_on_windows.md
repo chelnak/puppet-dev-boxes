@@ -7,7 +7,7 @@ cd windows/server-2019
 vagrant up
 ```
 
-After the machine starts it will get bootstrapped for development. See [bootstrap.ps1](scripts/bootstrap.ps1) for more information.
+After the machine starts it will get bootstrapped for development. See [bootstrap.ps1](windows/scripts/bootstrap.ps1) for more information.
 
 Lets start by accessing our new machine (You'll need an RDP client installed!).
 

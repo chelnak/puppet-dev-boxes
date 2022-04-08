@@ -7,7 +7,7 @@ cd ubuntu/2004
 vagrant up
 ```
 
-After the machine starts it will get bootstrapped for development. See the [Vagrantfile](ubuntu/Vagrantfile) for more information.
+After the machine starts it will get bootstrapped for development. See the [Vagrantfile](ubuntu/2004/Vagrantfile) for more information.
 
 Lets start by accessing our new machine. For this, you'll need `vscode` and the `Visual Studio Code Remote - SSH` extension.
 
