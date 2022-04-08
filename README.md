@@ -16,3 +16,4 @@ However the environments will also handle manifest based development.
 ### Debugging
 
 * [Beginners guide to Pry](https://medium.com/@eddgr/the-absolute-beginners-guide-to-using-pry-in-ruby-b08681558fa6)
+* [Pry cheat sheet](https://gist.github.com/lfender6445/9919357)
