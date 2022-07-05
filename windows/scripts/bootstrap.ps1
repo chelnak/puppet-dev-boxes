@@ -14,6 +14,7 @@ function Install-Application {
         [string]$Arguments
     )
 
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Invoke-WebRequest -Uri $Installer -OutFile $ExePath
 
     $Proc = Start-Process -FilePath $ExePath -ArgumentList $Arguments -PassThru -Wait
@@ -21,7 +22,6 @@ function Install-Application {
         Write-Error "Installation failed for $($Installer.split("/")[-1])}!" -ErrorAction Stop
     }
 }
-
 
 function Install-Chrome {
     $Installer = "http://dl.google.com/chrome/install/375.126/chrome_installer.exe"
@@ -40,7 +40,6 @@ function Install-VSCode {
     Install-Application -Installer $Installer -ExePath $ExePath -Arguments $InstallArgs
 }
 
-
 function Install-Git {
     Write-Host "-> Installing Git"
     $Installer = "https://github.com/git-for-windows/git/releases/download/v2.35.1.windows.2/Git-2.35.1.2-64-bit.exe"
@@ -50,17 +49,26 @@ function Install-Git {
     Install-Application -Installer $Installer -ExePath $ExePath -Arguments $InstallArgs
 }
 
-
 function Install-PoshGit {
     Write-Host "-> Installing PoshGit"
     Install-Module PowershellGet -Force
     Install-Module posh-git -Scope CurrentUser -Force
 }
 
-
 function Install-Ruby {
+    $Rubies = @{
+        "2.5.8" = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.5.8-1/rubyinstaller-devkit-2.5.8-1-x64.exe"
+        "2.7.5" = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.7.5-1/rubyinstaller-devkit-2.7.5-1-x64.exe"
+    }
+
     Write-Host "-> Installing Ruby"
-    $Installer = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.7.5-1/rubyinstaller-devkit-2.7.5-1-x64.exe"
+
+    $Installer = $Rubies[$Env:RUBY_VERSION]
+    if (!$Installer) {
+        Write-Host "-> Ruby version not detected, defaulting to 2.7.5"
+        $Installer = $Rubies["2.7.5"]
+    }
+
     $ExePath = "${ToolsDirectory}\ruby.exe"
     $InstallArgs = "/silent /tasks='assocfiles,modpath'"
 
