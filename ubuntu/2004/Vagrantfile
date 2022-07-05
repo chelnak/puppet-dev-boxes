@@ -13,12 +13,12 @@ Vagrant.configure('2') do |config|
 
   config.vm.synced_folder '.', '/vagrant'
 
-  config.vm.provision 'shell', privileged: false, inline: <<-SHELL
-    sudo apt-get update
-    sudo apt-get -y install ca-certificates
-    sudo apt-get -y install git curl libssl-dev libreadline-dev zlib1g-dev autoconf bison build-essential libyaml-dev libreadline-dev libncurses5-dev libffi-dev libgdbm-dev
+  config.vm.provision 'shell', privileged: true, inline: <<-SHELL
+    apt-get update
+    apt-get -y install ca-certificates
+    apt-get -y install git curl libssl-dev libreadline-dev zlib1g-dev autoconf bison build-essential libyaml-dev libreadline-dev libncurses5-dev libffi-dev libgdbm-dev
 
-    sudo rm -rf /usr/local/bin/rbenv-install
+    rm -rf /usr/local/bin/rbenv-install
 
     curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-installer | bash
 
@@ -27,11 +27,14 @@ Vagrant.configure('2') do |config|
     echo 'eval "$(rbenv init - bash)"' >> ~/.bashrc
     source ~/.bashrc
 
+    sudo echo 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/puppetlabs/bin"' >> /etc/sudoers.d/puppet
+
     export PATH="$HOME/.rbenv/bin:$PATH"
     curl -fsSL "https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-doctor" | bash
 
-    rbenv install 2.7.2
-    rbenv global 2.7.2
+    rbenv install 2.7.5
+    rbenv install 2.5.8
+    rbenv global 2.7.5
     ruby -v
 
     echo "gem: --no-document" > ~/.gemrc
