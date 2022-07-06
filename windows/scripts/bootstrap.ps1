@@ -63,8 +63,9 @@ function Install-Ruby {
 
     Write-Host "-> Installing Ruby"
 
-    $Installer = $Rubies[$Env:RUBY_VERSION]
-    if (!$Installer) {
+    if ($Env:RUBY_VERSION) {
+        $Installer = $Rubies[$Env:RUBY_VERSION]
+    } else {
         Write-Host "-> Ruby version not detected, defaulting to 2.7.5"
         $Installer = $Rubies["2.7.5"]
     }
