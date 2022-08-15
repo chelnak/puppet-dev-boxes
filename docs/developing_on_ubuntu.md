@@ -57,8 +57,14 @@ Underneath the `spec/fixtures/` you should now have the following directories:
 
 You can define test classes in `spec/fixtures/manifests/site.pp`
 
-The only thing left to do now is to make some changes and apply the manifest. You can do this by executing the following command:
+## Running Puppet
+
+Running Puppet requires the user to be root, this can cause a bit of complication when switching between users.
+
+To make life easier, the bootstrap process installs rbenv sudo. It allows you to run `bundle exec `commands with sudo.
+
+All that you need to do is prefix any `bundle exec` commands with `rbenv sudo` as follows:
 
 ```bash
-bundle exec puppet apply ./spec/fixtures/manifests/site.pp --modulepath ./spec/fixtures/modules/ --debug
+rbenv sudo bundle exec puppet apply ./spec/fixtures/manifests/site.pp --modulepath ./spec/fixtures/modules/ --debug
 ```

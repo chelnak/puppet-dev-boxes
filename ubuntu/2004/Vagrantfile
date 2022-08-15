@@ -13,33 +13,68 @@ Vagrant.configure('2') do |config|
 
   config.vm.synced_folder '.', '/vagrant'
 
-  config.vm.provision 'shell', privileged: true, inline: <<-SHELL
-    apt-get update
-    apt-get -y install ca-certificates
-    apt-get -y install git curl libssl-dev libreadline-dev zlib1g-dev autoconf bison build-essential libyaml-dev libreadline-dev libncurses5-dev libffi-dev libgdbm-dev
+  config.vm.provision 'shell', privileged: false, inline: <<-SHELL
+    export DEBIAN_FRONTEND=noninteractive
+
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+    sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+
+    sudo apt-get update
+    sudo apt-get -y install ca-certificates \
+      git \
+      curl \
+      libssl-dev \
+      libreadline-dev \
+      zlib1g-dev \
+      autoconf \
+      bison \
+      build-essential \
+      libyaml-dev \
+      libreadline-dev \
+      libncurses5-dev \
+      libffi-dev \
+      libgdbm-dev \
+      ruby-dev \
+      gh
 
     rm -rf /usr/local/bin/rbenv-install
 
     curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-installer | bash
 
     echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
-    echo 'export GEM_HOME="$HOME/.gem"' >> ~/.bashrc
     echo 'eval "$(rbenv init - bash)"' >> ~/.bashrc
     source ~/.bashrc
 
-    sudo echo 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/puppetlabs/bin"' >> /etc/sudoers.d/puppet
+    echo 'Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/opt/puppetlabs/bin"' | sudo tee /etc/sudoers.d/puppet
 
     export PATH="$HOME/.rbenv/bin:$PATH"
+
+    rbenv install 2.7.6
+    rbenv install 2.5.8
+    rbenv global 2.7.6
+    ruby -v
+
     curl -fsSL "https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-doctor" | bash
 
-    rbenv install 2.7.5
-    rbenv install 2.5.8
-    rbenv global 2.7.5
-    ruby -v
+    git clone https://github.com/dcarley/rbenv-sudo.git ~/.rbenv/plugins/rbenv-sudo
+
+    echo 'export GEM_HOME=$(ruby -e "puts Gem.user_dir")' >> ~/.bashrc
+    echo 'export PATH="$PATH:$GEM_HOME/bin"' >> ~/.bashrc
+    source ~/.bashrc
 
     echo "gem: --no-document" > ~/.gemrc
 
-    GEM_HOME="$HOME/.gem" gem install bundler
+    gem install solargraph --user-install
+    gem install bundler --user-install
+    gem install rubocop --user-install
+    gem install rubocop-performance --user-install
+    gem install rubocop-rspec --user-install
+    gem install fuubar --user-install
+    gem install pry-byebug --user-install
+    gem install pry-stack_explorer --user-install
+
+    rbenv rehash
 
     bundle config set --local path './.bundle/gems'
 
