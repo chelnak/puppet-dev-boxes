@@ -1,44 +1,50 @@
 # Developing on Ubuntu
 
-We're going to use `Ubuntu 20.04` in this example so lets start by changing directory and booting up our `vagrant` machine.
+## Provisioning the vagrant box
+
+We're going to use `Ubuntu 20.04` in this example so let's start by changing directory and booting up our `vagrant` machine.
 
 ```bash
 cd ubuntu/2004
 vagrant up
 ```
 
-After the machine starts it will get bootstrapped for development. See the [Vagrantfile](ubuntu/2004/Vagrantfile) for more information.
+After the machine starts it will get bootstrapped for development.
+See the [Vagrantfile](ubuntu/2004/Vagrantfile) for more information.
 
-Lets start by accessing our new machine. For this, you'll need `vscode` and the `Visual Studio Code Remote - SSH` extension.
+## Setting up the remove development extension
+
+You are going to need `vscode` and the `Visual Studio Code Remote - SSH` extension.
 
 Follow [this great guide](https://medium.com/@lopezgand/connect-visual-studio-code-with-vagrant-in-your-local-machine-24903fb4a9de) to get started.
 
 > ✨ **Tip!** By default, the ssh configuration from `vagrant ssh-config` will specify the Host as default. Change this to something more meaningful, like `vagrant`.
 
-Once you have a session established with your remote machine, open a new terminal and clone your module.
+## Clone your module
+
+Once you have a remote ssh session established with your remote machine, open a new terminal and clone your module.
 
 ```bash
 git clone https://github.com/puppetlabs/puppetlabs-motd
 cd puppetlabs-motd
 ```
 
-Open vscode and start a new terminal.
+## Making sure git is authenticated
 
-```bash
-code .
-```
+During bootstrap `gh-cli` is installed.
+We can use it to authenticate git and persist our access tokens.
 
-Debugging requires a few extra gems. For this we generally create a local Gemfile so that we don't have add any unnecessary dependencies in to our main Gemfile.
+From a terminal run `gh auth login` and follow the instructions ensuring that you choose `https` when asked to choose a protocol.
 
-```bash
-cat << EOF > ./gemfile.local
-  gem 'fuubar'
-  gem 'pry-byebug'
-  gem 'pry-stack_explorer'
-EOF
-```
+## .gitconfig and GPG
 
-Now run `bundle install` to pull down dependencies.
+During the bootstrap, your `.gitconfig` and gpg keys will also have been copied over to the guest os.
+
+
+## Install dependencies
+
+From inside the module directory run `bundle install`.
+Gems will be saved locally to `./.bundle/gems`.
 
 ```bash
 bundle install
@@ -55,16 +61,31 @@ Underneath the `spec/fixtures/` you should now have the following directories:
 * modules: `spec/fixtures/modules`
 * manifests: `spec/fixtures/manifests`
 
-You can define test classes in `spec/fixtures/manifests/site.pp`
+You can define test classes in `spec/fixtures/manifests/site.pp`.
+Alternatively you can run any of the example manifests provided with the module.
 
 ## Running Puppet
 
-Running Puppet requires the user to be root, this can cause a bit of complication when switching between users.
+Running Puppet usually requires elevated privileges.
+This can cause a bit of complication when developing modules because of bundler requirements.
 
-To make life easier, the bootstrap process installs rbenv sudo. It allows you to run `bundle exec `commands with sudo.
+To make life easier, the bootstrap process installs `rbenv sudo`. It allows you to run elevated `bundle exec` commands.
 
-All that you need to do is prefix any `bundle exec` commands with `rbenv sudo` as follows:
+Running the bundled version of Puppet with `rbenv sudo` would look like this
 
 ```bash
-rbenv sudo bundle exec puppet apply ./spec/fixtures/manifests/site.pp --modulepath ./spec/fixtures/modules/ --debug
+rbenv sudo bundle exec puppet apply examples/example.pp --modulepath ./spec/fixtures/modules
+```
+
+For convenience, this has been wrapped in a function called `puppet-apply` and made available via the default bash profile.
+
+```bash
+puppet-apply ./spec/fixtures/manifests/site.pp --debug
+```
+
+You may see an error after running `puppet-apply` for the first time.
+If this happens, just install the version of bundler mentioned in the error message.
+
+```bash
+rbenv sudo gem install bundler:2.1.4
 ```
