@@ -15,5 +15,6 @@ Function New-LocalGemfile {
     [IO.File]::WriteAllLines($Path, $Gems)
 }
 
+Set-Item -Path Env:\PDK_PUPPET_VERSION -Value '7.16.0'
 Import-Module posh-git
 Set-Location -Path $env:userprofile\code
