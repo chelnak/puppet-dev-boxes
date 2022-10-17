@@ -24,6 +24,7 @@ function Install-Application {
 }
 
 function Install-Chrome {
+    Write-Host "Installing Chrome..."
     $Installer = "http://dl.google.com/chrome/install/375.126/chrome_installer.exe"
     $ExePath = "$ToolsDirectory\chrome.exe"
     $InstallArgs = "/silent /install"
@@ -42,7 +43,7 @@ function Install-VSCode {
 
 function Install-Git {
     Write-Host "-> Installing Git"
-    $Installer = "https://github.com/git-for-windows/git/releases/download/v2.35.1.windows.2/Git-2.35.1.2-64-bit.exe"
+    $Installer = "https://github.com/git-for-windows/git/releases/download/v2.37.3.windows.1/Git-2.37.3-64-bit.exe"
     $ExePath = "$ToolsDirectory\git.exe"
     $InstallArgs = "/VERYSILENT /NORESTART"
 
@@ -55,10 +56,19 @@ function Install-PoshGit {
     Install-Module posh-git -Scope CurrentUser -Force
 }
 
+function Install-Cygwin {
+    Write-Host "-> Installing Cygwin"
+    $Installer = "https://cygwin.com/setup-x86_64.exe"
+    $ExePath = "$ToolsDirectory\cygwin.exe"
+    $InstallArgs = "--quiet-mode --no-shortcuts --no-startmenu --no-desktop --local-package-dir=c:\cygwin64 --site http://mirrors.kernel.org/sourceware/cygwin/ --packages git,openssh,rsync,unzip,wget,zip,make"
+
+    Install-Application -Installer $Installer -ExePath $ExePath -Arguments $InstallArgs
+    [Environment]::SetEnvironmentVariable("Path", $ENV:Path + "C:\cygwin64\bin", [EnvironmentVariableTarget]::Machine)
+}
+
 function Install-Ruby {
     $Rubies = @{
-        "2.5.8" = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.5.8-1/rubyinstaller-devkit-2.5.8-1-x64.exe"
-        "2.7.5" = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.7.5-1/rubyinstaller-devkit-2.7.5-1-x64.exe"
+        "2.7.6" = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-2.7.6-1/rubyinstaller-devkit-2.7.6-1-x64.exe"
     }
 
     Write-Host "-> Installing Ruby"
@@ -66,8 +76,8 @@ function Install-Ruby {
     if ($Env:RUBY_VERSION) {
         $Installer = $Rubies[$Env:RUBY_VERSION]
     } else {
-        Write-Host "-> Ruby version not detected, defaulting to 2.7.5"
-        $Installer = $Rubies["2.7.5"]
+        Write-Host "-> Ruby version not detected, defaulting to 2.7.6"
+        $Installer = $Rubies["2.7.6"]
     }
 
     $ExePath = "${ToolsDirectory}\ruby.exe"
@@ -77,11 +87,13 @@ function Install-Ruby {
 }
 
 Install-Git
+Install-Cygwin
 Install-Ruby
 Install-VSCode
 Install-PoshGit
 Install-Chrome
 
+Set-ItemProperty 'HKLM:\System\CurrentControlSet\Control\FileSystem' -Name 'LongPathsEnabled' -value 1
 Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" -Value 0
 Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
