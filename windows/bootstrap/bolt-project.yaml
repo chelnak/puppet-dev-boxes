@@ -1,0 +1,9 @@
+---
+name: bootstrap
+modules:
+- name: puppet-download_file
+  version_requirement: 4.0.0
+- name: puppetlabs-registry
+  version_requirement: 4.1.1
+- name: puppetlabs-reboot
+  version_requirement: 4.3.0

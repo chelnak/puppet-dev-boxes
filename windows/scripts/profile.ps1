@@ -16,5 +16,7 @@ Function New-LocalGemfile {
 }
 
 Set-Item -Path Env:\PDK_PUPPET_VERSION -Value '7.16.0'
+Set-Item -Path Env:\PATH -Value "$ENV:PATH;C:\Program Files\Git\cmd"
 Import-Module posh-git
 Set-Location -Path $env:userprofile\code
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\tokyonight_storm.omp.json" | Invoke-Expression
