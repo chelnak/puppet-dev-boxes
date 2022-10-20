@@ -5,8 +5,14 @@ A collection of vagrant boxes & guides that will level up your Puppet module dev
 ## Development guides
 
 These documents will help you get prepared for Puppet module development.
-They specifically focus on the development of Ruby types an providers.
-However the environments will also handle manifest based development.
+They specifically focus on the development of Ruby types and providers.
+However, the environments will also handle manifest-based development.
+
+### Requirements
+
+* [Vagrant](https://www.vagrantup.com/downloads)
+* [Bolt](https://puppet.com/docs/bolt/latest/bolt_installing.html)
+* [vagrant-bolt Vagrant plugin](https://github.com/oscar-stack/vagrant-bolt)
 
 ### Environment setup
 
