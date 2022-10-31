@@ -1,24 +1,20 @@
 # Developing on Ubuntu
 
-## Provisioning the vagrant box
+## Provisioning the Vagrant box
 
-We're going to use `Ubuntu 20.04` in this example so let's start by changing directory and booting up our `vagrant` machine.
+We're going to use `Ubuntu 20.04` in this example so let's start by booting up our `vagrant` machine.
 
 ```bash
-cd ubuntu/2004
-vagrant up
+make ubuntu 2004 up
 ```
-
 After the machine starts it will get bootstrapped for development.
 See the [Vagrantfile](ubuntu/2004/Vagrantfile) for more information.
 
-## Setting up the remove development extension
+Let's start by accessing our new machine.
 
-You are going to need `vscode` and the `Visual Studio Code Remote - SSH` extension.
-
-Follow [this great guide](https://medium.com/@lopezgand/connect-visual-studio-code-with-vagrant-in-your-local-machine-24903fb4a9de) to get started.
-
-> ✨ **Tip!** By default, the ssh configuration from `vagrant ssh-config` will specify the Host as default. Change this to something more meaningful, like `vagrant`.
+```bash
+make ubuntu 2004 ssh
+```
 
 ## Clone your module
 
@@ -29,9 +25,9 @@ git clone https://github.com/puppetlabs/puppetlabs-motd
 cd puppetlabs-motd
 ```
 
-## Making sure git is authenticated
+## Making sure Git is authenticated
 
-During bootstrap `gh-cli` is installed.
+During bootstrap, `gh-cli` is installed.
 We can use it to authenticate git and persist our access tokens.
 
 From a terminal run `gh auth login` and follow the instructions ensuring that you choose `https` when asked to choose a protocol.
@@ -50,7 +46,7 @@ Gems will be saved locally to `./.bundle/gems`.
 bundle install
 ```
 
-Once the dependencies have installed we need to initialize the module for development.
+Once the dependencies have been installed we need to initialize the module for development.
 
 ```bash
 bundle exec rake spec_prep
@@ -62,7 +58,7 @@ Underneath the `spec/fixtures/` you should now have the following directories:
 * manifests: `spec/fixtures/manifests`
 
 You can define test classes in `spec/fixtures/manifests/site.pp`.
-Alternatively you can run any of the example manifests provided with the module.
+Alternatively, you can run any of the examples provided with the module.
 
 ## Running Puppet
 
