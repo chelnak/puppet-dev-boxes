@@ -24,6 +24,9 @@ help:
 .PHONY: windows
 windows:
 	$(eval PLAT=windows)
+ifneq (,$(findstring up,$(MAKECMDGOALS)))
+	bolt module install --project ./windows/bootstrap
+endif
 
 server-2012R2:
 	$(eval VERSION=server-2012R2)
