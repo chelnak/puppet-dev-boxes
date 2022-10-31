@@ -18,7 +18,7 @@ plan bootstrap (
 
     # lint:ignore:140chars
     # Note:
-    # There is a bug that prevents this plan from being re run on the same target once ruby is installed.
+    #   There is a bug that prevents this plan from being re run on the same target once ruby is installed.
     # This is because custom_facts.rb will try to load puppet from the newly installed system ruby when
     # it should be targeting the puppet ruby.
     # The error will look like this:
@@ -66,6 +66,12 @@ plan bootstrap (
         destination_filename => 'ruby.exe',
         install_options => ['/silent', '/tasks=assocfiles,modpath']
       },
+      {
+        name => 'gh-cli',
+        url => 'https://github.com/cli/cli/releases/download/v2.18.1/gh_2.18.1_windows_amd64.msi',
+        destination_filename => 'gh-cli.msi',
+        install_options => ['/quiet', '/norestart'],
+      }
     ]
 
     $apps.each |$app| {
@@ -83,6 +89,47 @@ plan bootstrap (
       }
     }
 
+    $system_gems = [
+      {
+        name => 'solargraph',
+      },
+      {
+        name => 'bundler',
+      },
+      {
+        name => 'rubocop',
+      },
+      {
+        name => 'rubocop-performance',
+      },
+      {
+        name => 'rubocop-rspec',
+      },
+      {
+        name => 'fuubar',
+      },
+      {
+        name => 'pry-byebug',
+      },
+      {
+        name => 'pry-stack_explorer',
+      },
+    ]
+
+    $system_gems.each |$gem| {
+      exec { "Install ${gem['name']}":
+        command => "gem install ${gem['name']} --user-install",
+        provider => powershell,
+        require => Package['Install Ruby'],
+      }
+    }
+
+    exec { 'Configure Bundle Path':
+      command => "bundle config set --global path './.bundle'",
+      provider => powershell,
+      require => Package['Install Ruby'],
+    }
+
     $powershell_modules = [
       'PSReadline',
       'posh-git',
@@ -90,14 +137,14 @@ plan bootstrap (
 
     $powershell_modules.each |$module| {
       exec { "Install PowerShell module ${module}":
-        command => "Install-Module -Name ${module} -Force",
-        provider  => powershell,
+        command  => "Install-Module -Name ${module} -Force",
+        provider => powershell,
       }
     }
 
     exec { 'oh-my-ppsh':
-      command   => 'Set-ExecutionPolicy Bypass -Scope Process -Force; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString("https://ohmyposh.dev/install.ps1"))',
-      provider  => powershell,
+      command  => 'Set-ExecutionPolicy Bypass -Scope Process -Force; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString("https://ohmyposh.dev/install.ps1"))',
+      provider => powershell,
     }
 
     exec { 'Set Git Path':
@@ -112,7 +159,7 @@ plan bootstrap (
       require  => [
         Package['Install Cygwin'],
         Exec['Set Git Path'],
-      ]
+      ],
     }
 
     exec { 'Enable Remote Desktop firewall rule':
@@ -140,10 +187,10 @@ plan bootstrap (
       type   => 'dword',
       data   => 0,
     }
-  }
+ }
 
   run_plan('reboot', $targets)
 
   out::message('Box bootstrapped!')
-  out::message("You can now run 'vagrant rdp' or 'vagrant ssh' to connect to the box.")
+  out::message("You can now run 'make [os] [version] rdp' or 'vagrant [os] [version] ssh' to connect to the box.")
 }
