@@ -21,7 +21,6 @@ Vagrant.configure('2') do |config|
     end
   end
 
-  # config.vm.provision 'shell', path: '../scripts/bootstrap.ps1'
   profile_destination = 'C:\Users\vagrant\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1'
   config.vm.provision 'file', source: '../scripts/profile.ps1', destination: profile_destination
 end
