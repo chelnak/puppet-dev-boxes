@@ -72,6 +72,7 @@ ssh:
 	@VAGRANT_CWD=${PLAT}/${VERSION} vagrant ssh
 
 .PHONY: rdp
+rdp:
 	@[ "${PLAT}" ] || $(call log_error, "Operating System is not defined")
 	@[ "${VERSION}" ] || $(call log_error, "Version is not defined")
 
