@@ -52,7 +52,7 @@ plan bootstrap (
         name => 'Cygwin',
         url => 'https://cygwin.com/setup-x86_64.exe',
         destination_filename => 'cygwin.exe',
-        install_options => ['--quiet-mode', '--no-shortcuts', '--no-startmenu', '--no-desktop', '--local-package-dir=c:\cygwin64', '--site', 'http://mirrors.kernel.org/sourceware/cygwin/', '--packages', 'rsync,unzip,wget,zip,make']
+        install_options => ['--quiet-mode', '--no-shortcuts', '--no-startmenu', '--no-desktop', '--local-package-dir=c:\cygwin64', '--site', 'http://mirrors.kernel.org/sourceware/cygwin/', '--packages', 'rsync,unzip,wget,zip,make,x86_64-w64-mingw32-gcc']
       },
       {
         name => 'Git',
