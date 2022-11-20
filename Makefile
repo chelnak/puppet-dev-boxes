@@ -12,9 +12,10 @@ help:
 	@echo "\n"
 	@echo "Examples:"
 	@echo "  make ubuntu 2004 up"
+	@echo "  make ubuntu 2004 ssh"
+	@echo "  make ubuntu 2004 suspend"
 	@echo "  make windows server-2019 destroy"
 	@echo "  make windows server-2019 rdp"
-	@echo "  make ubuntu 2004 ssh"
 	@echo "\n"
 
 
@@ -25,7 +26,7 @@ help:
 windows:
 	$(eval PLAT=windows)
 ifneq (,$(findstring up,$(MAKECMDGOALS)))
-	bolt module install --project ./windows/bootstrap
+	/opt/puppetlabs/bin/bolt module install --project ./windows/bootstrap
 endif
 
 server-2012R2:
@@ -45,7 +46,7 @@ server-2022:
 ubuntu:
 	$(eval PLAT=ubuntu)
 
-2204:
+2004:
 	$(eval VERSION=2004)
 
 # ============= Vagrant ============= #
@@ -72,7 +73,15 @@ ssh:
 	@VAGRANT_CWD=${PLAT}/${VERSION} vagrant ssh
 
 .PHONY: rdp
+rdp:
 	@[ "${PLAT}" ] || $(call log_error, "Operating System is not defined")
 	@[ "${VERSION}" ] || $(call log_error, "Version is not defined")
 
 	@VAGRANT_CWD=${PLAT}/${VERSION} vagrant rdp
+
+.PHONY: suspend
+suspend:
+	@[ "${PLAT}" ] || $(call log_error, "Operating System is not defined")
+	@[ "${VERSION}" ] || $(call log_error, "Version is not defined")
+
+	@VAGRANT_CWD=${PLAT}/${VERSION} vagrant suspend
