@@ -51,8 +51,19 @@ Vagrant.configure('2') do |config|
     # Configure starship
     echo 'eval "$(starship init bash)"' >> ~/.profile
 
+    # Compile OpenSSL
+    # This isn't great but it seems like older versions of ruby
+    # no longer work with newer versions of OpenSSL
+    # To work around this we compile OpenSSL from source and pass it to RUBY_CONFIGURE_OPTS
+    # This blog was helpful: https://deanpcmad.com/2022/installing-older-ruby-versions-on-ubuntu-22-04/
+    wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz
+    tar zxvf openssl-1.1.1g.tar.gz
+    cd openssl-1.1.1g && ./config --prefix=$HOME/.openssl/openssl-1.1.1g && make && sudo make install && cd -
+    rm -rf ~/.openssl/openssl-1.1.1g/certs
+    sudo ln -s /etc/ssl/certs ~/.openssl/openssl-1.1.1g/certs
+
     # Setup Ruby
-    rbenv install 2.7.6
+    RUBY_CONFIGURE_OPTS=--with-openssl-dir=$HOME/.openssl/openssl-1.1.1g rbenv install 2.7.6
     rbenv global 2.7.6
     ruby -v
 
