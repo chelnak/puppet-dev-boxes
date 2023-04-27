@@ -11,7 +11,7 @@ After the machine starts it will get bootstrapped for development.
 See the [Vagrantfile](ubuntu/2004/Vagrantfile) for more information.
 
 Note: there is a line in the vagrantfile that may need to be commented out depending on your setup, it has been marked so it is easy to find.
-As an additional note, the default ruby version for this box is currently set to v3.1.2, to change this simply update the relevant lines within the vagrantfile.
+As an additional note, the default ruby version for this box is currently set to v3.2.0, to change this simply update the relevant lines within the vagrantfile.
 
 Let's start by accessing our new machine.
 
