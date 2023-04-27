@@ -10,6 +10,9 @@ make ubuntu 2004 up
 After the machine starts it will get bootstrapped for development.
 See the [Vagrantfile](ubuntu/2004/Vagrantfile) for more information.
 
+Note: there is a line in the vagrantfile that may need to be commented out depending on your setup, it has been marked so it is easy to find.
+As an additional note, the default ruby version for this box is currently set to v3.2.0, to change this simply update the relevant lines within the vagrantfile.
+
 Let's start by accessing our new machine.
 
 ```bash
@@ -36,6 +39,11 @@ From a terminal run `gh auth login` and follow the instructions ensuring that yo
 
 During the bootstrap, your `.gitconfig` and gpg keys will also have been copied over to the guest os.
 
+## Shared content folder
+
+A shared content folder has been enabled for this image, simply place any files or modules you wish to be mirrored onto the vagrant box within `./ubuntu/2004/` and they will appear on the vagrant box.
+
+Enter `cd ../../vagrant/` upon from the initial ssh location to find them.
 
 ## Install dependencies
 
@@ -68,6 +76,8 @@ This can cause a bit of complication when developing modules because of bundler 
 To make life easier, the bootstrap process installs `rbenv sudo`. It allows you to run elevated `bundle exec` commands.
 
 Running the bundled version of Puppet with `rbenv sudo` would look like this
+
+NOTE: May need to install bundler for sudo, i.e. `rbenv sudo gem install bundler:2.1.4`
 
 ```bash
 rbenv sudo bundle exec puppet apply examples/example.pp --modulepath ./spec/fixtures/modules

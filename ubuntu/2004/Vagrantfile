@@ -15,6 +15,7 @@ Vagrant.configure('2') do |config|
 
   config.vm.provision 'file', source: '~/.gitconfig', destination: '~/.gitconfig'
   config.vm.provision 'file', source: '~/.gnupg/private-keys-v1.d', destination: '~/.gnupg/private-keys-v1.d'
+  # The below line may need to be commented out
   config.vm.provision 'file', source: '~/.gnupg/pubring.kbx', destination: '~/.gnupg/pubring.kbx'
   config.vm.provision 'file', source: '~/.gnupg/trustdb.gpg', destination: '~/.gnupg/trustdb.gpg'
 
@@ -63,8 +64,8 @@ Vagrant.configure('2') do |config|
     sudo ln -s /etc/ssl/certs ~/.openssl/openssl-1.1.1g/certs
 
     # Setup Ruby
-    RUBY_CONFIGURE_OPTS=--with-openssl-dir=$HOME/.openssl/openssl-1.1.1g rbenv install 2.7.6
-    rbenv global 2.7.6
+    RUBY_CONFIGURE_OPTS=--with-openssl-dir=$HOME/.openssl/openssl-1.1.1g rbenv install 3.2.0
+    rbenv global 3.2.0
     ruby -v
 
     git clone https://github.com/dcarley/rbenv-sudo.git ~/.rbenv/plugins/rbenv-sudo
@@ -92,6 +93,7 @@ Vagrant.configure('2') do |config|
     rbenv sudo bundle config set --global path './.bundle/gems'
 
     cat << 'EOF' >> ~/.profile
+    eval "$(rbenv init -)"
     function puppet-apply() {
       rbenv sudo bundle exec puppet apply $@ --modulepath spec/fixtures/modules
     }
